@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>App Evaluación REBA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f2f5ff;
+            margin: 0;
+            padding: 30px;
+        }
+        h1 {
+            text-align: center;
+            color: #0d47a1;
+            margin-top: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.15);
+        }
+        h2, h3 {
+            color: #1565c0;
+            border-bottom: 2px solid #e3e8ff;
+            padding-bottom: 5px;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        
+        /* ESTILOS DEL BOTÓN VOLVER */
+        .volver {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background: #34495e;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .volver:hover {
+            background: #2c3e50;
+        }
+
+        button {
+            padding: 12px;
+            width: 100%;
+            background: #1565c0;
+            color: white;
+            border: none;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #0d47a1;
+        }
+        .resultado {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f5f7ff;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background: #e8ecff;
+        }
+        .barra {
+            height: 25px;
+            background: #ddd;
+            border-radius: 10px;
+            margin-top: 15px;
+            overflow: hidden;
+        }
+        .progreso {
+            height: 25px;
+            width: 0%;
+            background: #2ecc71; 
+            transition: width 0.5s ease-in-out, background 0.5s ease-in-out;
+        }
+        #resumenEstacion {
+            margin-top: 20px; 
+            margin-bottom: 20px; 
+            padding: 15px; 
+            background: #e8ecff; 
+            border-radius: 8px; 
+            text-align: center; 
+            font-size: 18px; 
+            font-weight: bold; 
+            border: 2px solid #1565c0;
+        }
+
+        /* --- CONFIGURACIÓN PARA IMPRESIÓN --- */
+        .barra, .progreso, #resumenEstacion {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        @media print {
+            /* Ocultamos inputs, selects, botones y el enlace de volver */
+            input, select, button, label, h3, h1, .volver {
+                display: none !important;
+            }
+            body {
+                background: white !important;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none !important;
+                border: none;
+                padding: 0;
+                margin: 0;
+            }
+            .barra {
+                display: block !important;
+                border: 1px solid #ccc;
+            }
+            .resultado {
+                border: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <a href="metodos.html" class="volver">⬅ Regresar al menú</a>
+
+    <h1>Evaluación Ergonómica REBA</h1>
+    <div class="container">
+        <h3>Datos de evaluación</h3>
+        <input id="tarea" placeholder="Tarea">
+        <input id="evaluador" placeholder="Evaluador">
+        <input id="fecha" type="date">
+
+        <h3>Grupo A (Análisis de Cuello, Tronco y Piernas)</h3>
+        <label>Cuello</label>
+        <select id="cuello">
+            <option value="1">0° a 20°</option>
+            <option value="2">>20° o en extensión</option>
+            <option value="3">Torcido o inclinado lateralmente (+1 aplicado)</option>
+        </select>
+        
+        <label>Tronco</label>
+        <select id="tronco">
+            <option value="1">0° (Erguido)</option>
+            <option value="2">0° a 20°</option>
+            <option value="3">20° a 60°</option>
+            <option value="4">>60°</option>
+        </select>
+        
+        <label>Piernas</label>
+        <select id="piernas">
+            <option value="1">Soporte bilateral (Estables)</option>
+            <option value="2">Soporte unilateral (Inestables)</option>
+        </select>
+
+        <label>Carga / Fuerza (Paso 5)</label>
+        <select id="carga">
+            <option value="0">< 5 kg (< 11 lbs)</option>
+            <option value="1">5 a 10 kg (11 a 22 lbs)</option>
+            <option value="2">> 10 kg (> 22 lbs)</option>
+        </select>
+
+        <h3>Grupo B (Análisis de Brazos y Muñecas)</h3>
+        <label>Brazo superior</label>
+        <select id="brazo">
+            <option value="1">0° a 20°</option>
+            <option value="2">20° a 45°</option>
+            <option value="3">45° a 90°</option>
+            <option value="4">>90°</option>
+        </select>
+        
+        <label>Antebrazo</label>
+        <select id="antebrazo">
+            <option value="1">60° a 100°</option>
+            <option value="2"><60° o >100°</option>
+        </select>
+        
+        <label>Muñeca</label>
+        <select id="muneca">
+            <option value="1">0° a 15° (Neutral)</option>
+            <option value="2">>15° (Flexión / extensión)</option>
+        </select>
+
+        <label>Agarre de la carga (Coupling - Paso 11)</label>
+        <select id="agarre">
+            <option value="0">Bueno (Agarre cómodo y seguro)</option>
+            <option value="1">Regular (Aceptable pero no ideal)</option>
+            <option value="2">Malo (Agarre inseguro o sin asas)</option>
+            <option value="3">Inaceptable (Peligroso o muy incómodo)</option>
+        </select>
+
+        <h3>Puntuación de Actividad (Paso 13)</h3>
+        <select id="actividad">
+            <option value="0">Normal (Movimiento dinámico habitual)</option>
+            <option value="1">Estática (1 o más partes del cuerpo quietas > 1 min)</option>
+            <option value="1">Repetitiva (Acción repetida > 4 veces por minuto)</option>
+            <option value="2">Estática + Repetitiva (Ambas condiciones)</option>
+        </select>
+
+        <button onclick="calcularREBA()">Calcular REBA</button>
+        
+        <div class="resultado" id="resultado">Esperando evaluación...</div>
+        
+        <div class="barra">
+            <div id="barraProgreso" class="progreso" style="width: 0%;"></div>
+        </div>
+
+        <div id="recomendacion" style="margin-top: 15px; font-weight: bold; color: #333; text-align: center;"></div>
+
+        <h2>Registro de evaluaciones</h2>
+        <table id="tablaDatos">
+            <tr>
+                <th>Tarea</th>
+                <th>Evaluador</th>
+                <th>Fecha</th>
+                <th>REBA Final</th>
+                <th>Nivel de Riesgo</th>
+            </tr>
+        </table>
+
+        <div id="resumenEstacion">
+            Riesgo Promedio de la Estación: Esperando datos...
+        </div>
+
+        <button onclick="imprimir()" style="background: #34495e;">Imprimir reporte</button>
+    </div>
+
+    <script>
+        // --- MATRICES OFICIALES DEL MÉTODO REBA ---
+        const tablaA = [
+            [[1,2,3,4], [1,2,3,4], [3,3,5,6]], // Tronco 1
+            [[2,3,4,5], [3,4,5,6], [4,5,6,7]], // Tronco 2
+            [[2,4,5,6], [4,5,6,7], [5,6,7,8]], // Tronco 3
+            [[3,5,6,7], [5,6,7,8], [6,7,8,9]], // Tronco 4
+            [[4,6,7,8], [6,7,8,9], [7,8,9,9]]  // Tronco 5
+        ];
+
+        const tablaB = [
+            [[1,2,2], [1,2,3]], // Brazo 1
+            [[1,2,3], [2,3,4]], // Brazo 2
+            [[3,4,5], [4,5,5]], // Brazo 3
+            [[4,5,5], [5,6,7]], // Brazo 4
+            [[6,7,8], [7,8,8]], // Brazo 5
+            [[7,8,8], [8,9,9]]  // Brazo 6
+        ];
+
+        const tablaC = [
+            [1, 1, 1, 2, 3, 3, 4, 5, 6, 7, 7, 7],
+            [1, 2, 2, 3, 4, 4, 5, 6, 6, 7, 7, 8],
+            [2, 3, 3, 3, 4, 5, 6, 7, 7, 8, 8, 8],
+            [3, 4, 4, 4, 5, 6, 7, 8, 8, 9, 9, 9],
+            [4, 4, 4, 5, 6, 7, 8, 8, 9, 9, 9, 9],
+            [6, 6, 6, 7, 8, 8, 9, 9, 10,10,10,10],
+            [7, 7, 7, 8, 9, 9, 9, 10,10,11,11,11],
+            [8, 8, 8, 9, 10,10,10,10,10,11,11,11],
+            [9, 9, 9, 10,10,10,11,11,11,12,12,12],
+            [10,10,10,11,11,11,11,12,12,12,12,12],
+            [11,11,11,11,12,12,12,12,12,12,12,12],
+            [12,12,12,12,12,12,12,12,12,12,12,12]
+        ];
+
+        function calcularREBA() {
+            let tarea = document.getElementById("tarea").value;
+            let evaluador = document.getElementById("evaluador").value;
+            let fecha = document.getElementById("fecha").value;
+
+            let cuelloIdx = Math.min(parseInt(document.getElementById("cuello").value), 3) - 1;
+            let troncoIdx = Math.min(parseInt(document.getElementById("tronco").value), 5) - 1;
+            let piernasIdx = Math.min(parseInt(document.getElementById("piernas").value), 4) - 1;
+
+            let brazoIdx = Math.min(parseInt(document.getElementById("brazo").value), 6) - 1;
+            let antebrazoIdx = Math.min(parseInt(document.getElementById("antebrazo").value), 2) - 1;
+            let munecaIdx = Math.min(parseInt(document.getElementById("muneca").value), 3) - 1;
+
+            let carga = parseInt(document.getElementById("carga").value);
+            let agarre = parseInt(document.getElementById("agarre").value);
+            let actividad = parseInt(document.getElementById("actividad").value);
+
+            let scoreA_crudo = tablaA[troncoIdx][cuelloIdx][piernasIdx];
+            let scoreA = scoreA_crudo + carga;
+
+            let scoreB_crudo = tablaB[brazoIdx][antebrazoIdx][munecaIdx];
+            let scoreB = scoreB_crudo + agarre;
+
+            let indexA = Math.max(0, Math.min(scoreA, 12) - 1);
+            let indexB = Math.max(0, Math.min(scoreB, 12) - 1);
+
+            let scoreC = tablaC[indexA][indexB];
+            
+            let reba = scoreC + actividad;
+            
+            let riesgo = "";
+            let color = "";
+
+            let barra = document.getElementById("barraProgreso");
+            let porcentaje = (reba / 15) * 100;
+            if (porcentaje > 100) porcentaje = 100;
+            barra.style.width = porcentaje + "%";
+
+            if (reba <= 1) {
+                riesgo = "Inapreciable";
+                color = "#2ecc71";
+            } else if (reba <= 3) {
+                riesgo = "Bajo";
+                color = "#27ae60";
+            } else if (reba <= 7) {
+                riesgo = "Medio";
+                color = "#f39c12";
+            } else if (reba <= 10) {
+                riesgo = "Alto";
+                color = "#e74c3c";
+            } else {
+                riesgo = "Muy Alto";
+                color = "#8b0000";
+            }
+
+            barra.style.background = color;
+            document.getElementById("resultado").innerHTML = "Puntaje REBA: " + reba + " | Riesgo: " + riesgo;
+            
+            // Llamamos a la función de recomendaciones automáticamente
+            recomendaciones();
+            
+            guardarDatos(tarea, evaluador, fecha, reba, riesgo);
+        }
+
+        function recomendaciones() {
+            let texto = document.getElementById("resultado").innerHTML;
+            let rec = "";
+
+            if (texto.includes("Inapreciable") || texto.includes("Bajo")) {
+                rec = "Recomendación: Nivel aceptable. Mantener las condiciones actuales y monitorear periódicamente.";
+            } else if (texto.includes("Medio")) {
+                rec = "Recomendación: Riesgo medio. Es necesario investigar más a fondo y realizar cambios pronto.";
+            } else if (texto.includes("Alto") || texto.includes("Muy Alto")) {
+                rec = "Recomendación: Riesgo crítico. Se requiere investigar e implementar rediseño ergonómico inmediatamente.";
+            } else {
+                rec = "";
+            }
+
+            document.getElementById("recomendacion").innerHTML = rec;
+        }
+
+        function guardarDatos(tarea, evaluador, fecha, reba, riesgo) {
+            let tabla = document.getElementById("tablaDatos");
+            let fila = tabla.insertRow();
+            
+            fila.insertCell(0).innerHTML = tarea;
+            fila.insertCell(1).innerHTML = evaluador;
+            fila.insertCell(2).innerHTML = fecha;
+            fila.insertCell(3).innerHTML = reba;
+            fila.insertCell(4).innerHTML = riesgo;
+
+            calcularPromedio();
+        }
+
+        function calcularPromedio() {
+            let tabla = document.getElementById("tablaDatos");
+            let filas = tabla.rows.length;
+            
+            if (filas <= 1) return; 
+
+            let suma = 0;
+            for (let i = 1; i < filas; i++) {
+                suma += parseFloat(tabla.rows[i].cells[3].innerHTML);
+            }
+
+            let promedio = Math.round(suma / (filas - 1)); 
+            
+            let riesgoGlobal = "";
+            let colorGlobal = "";
+
+            if (promedio <= 1) {
+                riesgoGlobal = "Inapreciable";
+                colorGlobal = "#2ecc71";
+            } else if (promedio <= 3) {
+                riesgoGlobal = "Bajo";
+                colorGlobal = "#27ae60";
+            } else if (promedio <= 7) {
+                riesgoGlobal = "Medio";
+                colorGlobal = "#f39c12";
+            } else if (promedio <= 10) {
+                riesgoGlobal = "Alto";
+                colorGlobal = "#e74c3c";
+            } else {
+                riesgoGlobal = "Muy Alto";
+                colorGlobal = "#8b0000";
+            }
+
+            let contenedor = document.getElementById("resumenEstacion");
+            contenedor.innerHTML = "Riesgo Promedio de la Estación: " + promedio + " | Nivel Global: " + riesgoGlobal;
+            contenedor.style.background = colorGlobal;
+            contenedor.style.color = "white"; 
+            contenedor.style.borderColor = colorGlobal;
+        }
+
+        function imprimir() {
+            window.print();
+        }
+    </script>
+</body>
+</html>
