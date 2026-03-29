@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluador Rodgers Profesional</title>
+    <style>
+        :root {
+            --baja: #27ae60; --mod: #f1c40f; --alta: #e67e22; --vhigh: #c0392b;
+            --dark: #2c3e50;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; }
+        .container { max-width: 1150px; margin: auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h2 { color: var(--dark); text-align: center; margin-bottom: 20px; }
+        
+        .resumen-final { display: flex; justify-content: space-between; align-items: center; background: var(--dark); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+        
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #dee2e6; padding: 10px; text-align: center; }
+        th { background: #f8f9fa; color: #333; font-size: 0.9em; }
+        
+        .parte-nombre { text-align: left; font-weight: bold; background: #f8f9fa; width: 140px; }
+        
+        select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; font-size: 0.85em; }
+        .prioridad-celda { font-weight: bold; color: white; text-transform: uppercase; padding: 10px; border-radius: 4px; }
+        
+        .prio-4 { background: var(--vhigh); }
+        .prio-3 { background: var(--alta); }
+        .prio-2 { background: var(--mod); color: #333; }
+        .prio-1 { background: var(--baja); }
+
+        .btn-csv { background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 20px; float: right; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Análisis de Fatiga Muscular de Rodgers</h2>
+
+  
+    <table id="tabla-rodgers">
+        <thead>
+            <tr>
+                <th>Segmento</th>
+                <th style="width: 35%;">Intensidad del Esfuerzo</th>
+                <th style="width: 20%;">Duración</th>
+                <th style="width: 20%;">Frecuencia</th>
+                <th style="width: 15%;">Resultado</th>
+            </tr>
+        </thead>
+        <tbody id="cuerpo-tabla">
+            </tbody>
+    </table>
+
+
+</div>
+
+<script>
+    const dataRodgers = [
+        { 
+            n: "Cuello", 
+            i1: "Ligero: Cabeza estirada hacia adelante", 
+            i2: "Mod: Cabeza girada o inclinada", 
+            i3: "Pesado: Giro completo o con fuerza" 
+        },
+        { 
+            n: "Espalda", 
+            i1: "Ligero: Inclinarse <30° o de lado; arquear", 
+            i2: "Mod: Inclinarse sin carga; trabajar sobre hombros", 
+            i3: "Pesado: Giro cintura; mucha fuerza; alcance >80cm" 
+        },
+        { 
+            n: "Hombros", 
+            i1: "Ligero: Brazos ligeramente separados / con apoyo", 
+            i2: "Mod: Brazos alejados sin apoyo", 
+            i3: "Pesado: Trabajar arriba del hombro; mucha fuerza" 
+        },
+        { 
+            n: "Brazos / Codos", 
+            i1: "Ligero: Agarres cómodos; carga junto al cuerpo", 
+            i2: "Mod: Brazos alejados o arriba del hombro", 
+            i3: "Pesado: Igual que mod. con fuerza o peso extremo" 
+        },
+        { 
+            n: "Muñecas / Manos", 
+            i1: "Ligero: Poca fuerza; carga junto al cuerpo", 
+            i2: "Mod: Rotación antebrazo; ángulos moderados", 
+            i3: "Pesado: Mucha fuerza con rotación o ángulos extremos" 
+        },
+        { 
+            n: "Piernas / Pies", 
+            i1: "Ligero: Caminar o estar de pie", 
+            i2: "Mod: Cuclillas; peso sobre una pierna", 
+            i3: "Pesado: Agacharse con fuerza; empujar/jalar fuerte" 
+        }
+    ];
+
+    function inicializar() {
+        const tbody = document.getElementById('cuerpo-tabla');
+        dataRodgers.forEach((s, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="parte-nombre">${s.n}</td>
+                <td>
+                    <select id="i-${idx}" onchange="recalcular()">
+                        <option value="1">${s.i1}</option>
+                        <option value="2">${s.i2}</option>
+                        <option value="3">${s.i3}</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="d-${idx}" onchange="recalcular()">
+                        <option value="1">1: < 6 seg</option>
+                        <option value="2">2: 6 a 20 seg</option>
+                        <option value="3">3: > 20 seg</option>
+                    </select>
+                </td>
+                <td>
+                    <select id="f-${idx}" onchange="recalcular()">
+                        <option value="1">1: < 1 por min</option>
+                        <option value="2">2: 1 a 5 por min</option>
+                        <option value="3">3: > 5 por min</option>
+                    </select>
+                </td>
+                <td id="res-${idx}" class="prioridad-celda prio-1">BAJA</td>
+            `;
+            tbody.appendChild(tr);
+        });
+        recalcular();
+    }
+
+    function recalcular() {
+        let maxNivel = 1;
+        const textos = { 1: "BAJA", 2: "MODERADA", 3: "ALTA", 4: "MUY ALTA" };
+
+        dataRodgers.forEach((_, idx) => {
+            const i = parseInt(document.getElementById(`i-${idx}`).value);
+            const d = parseInt(document.getElementById(`d-${idx}`).value);
+            const f = parseInt(document.getElementById(`f-${idx}`).value);
+
+            let nivel = 1;
+            const n3 = [i, d, f].filter(v => v === 3).length;
+
+            if (n3 >= 2) nivel = 4;
+            else if (i === 3 || (i === 2 && d === 3 && f === 2)) nivel = 3;
+            else if (i === 2 || d === 2 || f === 2) nivel = 2;
+
+            const td = document.getElementById(`res-${idx}`);
+            td.innerText = textos[nivel];
+            td.className = `prioridad-celda prio-${nivel}`;
+
+            if (nivel > maxNivel) maxNivel = nivel;
+        });
+
+        const badge = document.getElementById('global-badge');
+        badge.innerText = textos[maxNivel];
+        badge.className = `prioridad-celda prio-${maxNivel}`;
+    }
+
+    function exportarCSV() {
+        const filas = [["Segmento", "Intensidad", "Duracion", "Frecuencia", "Prioridad"]];
+        dataRodgers.forEach((s, idx) => {
+            filas.push([
+                s.n,
+                document.getElementById(`i-${idx}`).options[document.getElementById(`i-${idx}`).selectedIndex].text,
+                document.getElementById(`d-${idx}`).value,
+                document.getElementById(`f-${idx}`).value,
+                document.getElementById(`res-${idx}`).innerText
+            ]);
+        });
+        const csv = "data:text/csv;charset=utf-8," + filas.map(e => e.join(",")).join("\n");
+        const link = document.createElement("a");
+        link.href = encodeURI(csv);
+        link.download = "Analisis_Rodgers.csv";
+        link.click();
+    }
+
+    window.onload = inicializar;
+</script>
+
+</body>
+</html>
