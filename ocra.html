@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora OCRA Check-List Profesional</title>
+    <style>
+        :root {
+            --optimo: #27ae60; --aceptable: #2ecc71; --muy-bajo: #f1c40f; 
+            --bajo: #f39c12; --medio: #e67e22; --alto: #c0392b; --dark: #2c3e50;
+        }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; font-size: 14px; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        h1 { color: var(--dark); text-align: center; margin-bottom: 20px; }
+        
+        .result-panel { display: flex; justify-content: space-between; align-items: center; background: var(--dark); color: white; padding: 25px; border-radius: 8px; margin-bottom: 25px; border-left: 10px solid #bdc3c7; }
+        .score-display { font-size: 3em; font-weight: bold; }
+        
+        .grid-eval { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .card { background: #ffffff; border: 1px solid #dee2e6; padding: 18px; border-radius: 8px; }
+        .card h3 { margin-top: 0; color: var(--dark); border-bottom: 2px solid #f8f9fa; padding-bottom: 8px; font-size: 1.1em; }
+        
+        label { display: block; margin: 12px 0 6px; font-weight: bold; color: #444; }
+        select { width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; background: #fff; font-size: 0.9em; line-height: 1.4; }
+        
+        .status-badge { padding: 15px 30px; border-radius: 6px; font-weight: bold; text-transform: uppercase; font-size: 1.2em; min-width: 180px; text-align: center; }
+        .level-optimo { background: var(--optimo); }
+        .level-aceptable { background: var(--aceptable); }
+        .level-muy-bajo { background: var(--muy-bajo); color: #333; }
+        .level-bajo { background: var(--bajo); }
+        .level-medio { background: var(--medio); }
+        .level-alto { background: var(--alto); }
+
+        .footer-tools { margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee; text-align: right; }
+        .btn { background: #27ae60; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+<div class="container">
+<button style="padding:10px 20px;  color:white; border:none; border-radius:5px;">
+ <a href="principal.html">Regresar al menú</a>
+</button>
+
+<div class="container">
+    <h1>Evaluación Rápida: Check List OCRA</h1>
+    
+    <div class="result-panel" id="panel-color">
+        <div>
+            <div style="font-size: 1em; opacity: 0.9;">Índice Check List OCRA (ICKL):</div>
+            <div id="score" class="score-display">0.0</div>
+        </div>
+        <div id="status" class="status-badge level-optimo">Óptimo</div>
+    </div>
+
+    <div class="grid-eval">
+        <div class="card">
+            <h3>1. Factor Recuperación (FR)</h3>
+            <label>Escenario de pausas e interrupciones:</label>
+            <select id="fr" onchange="calcular()">
+                <option value="0">0: Pausa ≥8 min/h (inc. almuerzo) o recuperación en ciclo (10s cada 60s)</option>
+                <option value="2">2: 4 pausas ≥8 min en turno 7-8h (+ almuerzo) o 4 pausas en turno 6h (sin almuerzo)</option>
+                <option value="3">3: 3 pausas ≥8 min en turno 7-8h (+ almuerzo) o 2 pausas en turno 6h (sin almuerzo)</option>
+                <option value="4">4: 2 pausas ≥8 min (+ almuerzo) en 7-8h o 1 pausa en turno de 6-7h</option>
+                <option value="6">6: En 8 horas de trabajo solo existe el descanso para almorzar</option>
+                <option value="10">10: Sin pausas reales (solo interrupciones < 5 min en todo el turno)</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <h3>2. Factor Frecuencia (FF)</h3>
+            <label>Acciones técnicas por minuto:</label>
+            <select id="ff" onchange="calcular()">
+                <option value="0">0: Acciones lentas (aprox. 20/min). Pausas frecuentes.</option>
+                <option value="1">1: Acciones rítmicas (aprox. 30/min). Pausas breves.</option>
+                <option value="3">3: Acciones constantes (aprox. 40/min). Pocas pausas.</option>
+                <option value="4">4: Acciones rápidas (aprox. 50/min). Sin pausas reales.</option>
+                <option value="6">6: Acciones muy rápidas (aprox. 60/min). Ritmo difícil.</option>
+                <option value="10">10: Ritmo frenético (>70/min). Imposible de mantener.</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <h3>3. Factor Fuerza (FFz)</h3>
+            <label>Esfuerzo muscular percibido (Escala Borg):</label>
+            <select id="ffz" onchange="calcular()">
+                <option value="0">0: Nula o muy ligera (Borg 0-2)</option>
+                <option value="2">2: Ligera (Borg 3). Acciones de golpe/empuje.</option>
+                <option value="4">4: Moderada (Borg 4-5). Esfuerzo claramente visible.</option>
+                <option value="8">8: Intensa (Borg 6-7). Gran parte de la capacidad.</option>
+                <option value="16">16: Extrema (Borg 8-10). Cerca del límite del operario.</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <h3>4. Factor Postura (FP)</h3>
+            <label>Posturas forzadas (Hombro, Codo, Muñeca, Mano):</label>
+            <select id="fp" onchange="calcular()">
+                <option value="0">0: Posturas neutras casi todo el tiempo.</option>
+                <option value="2">2: Agarre en pinza (pinch) o alcances moderados frecuentes.</option>
+                <option value="4">4: Hombro elevado o muñeca doblada (1/3 del ciclo).</option>
+                <option value="8">8: Posturas extremas durante más de la mitad del ciclo.</option>
+                <option value="12">12: Posturas extremas constantes.</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <h3>5. Factores Adicionales (FA)</h3>
+            <label>Vibraciones, frío, guantes o compresiones:</label>
+            <select id="fa" onchange="calcular()">
+                <option value="0">0: Sin factores de riesgo adicionales.</option>
+                <option value="1">1: Uso de guantes inadecuados o frío moderado.</option>
+                <option value="2">2: Vibraciones o golpes (1/3 del tiempo).</option>
+                <option value="3">3: Herramientas vibrantes o golpes constantes (>1/2 tiempo).</option>
+                <option value="4">4: Compresiones localizadas o frío intenso constante.</option>
+            </select>
+        </div>
+
+        <div class="card">
+            <h3>6. Duración de la Tarea (MD)</h3>
+            <label>Tiempo neto de trabajo repetitivo:</label>
+            <select id="md" onchange="calcular()">
+                <option value="0.5">0.5: < 120 minutos</option>
+                <option value="0.7">0.7: 121 - 180 minutos</option>
+                <option value="0.85">0.85: 181 - 240 minutos</option>
+                <option value="0.92">0.92: 241 - 300 minutos</option>
+                <option value="1.0" selected>1.0: 301 - 360 minutos (Jornada típica)</option>
+                <option value="1.2">1.2: 421 - 480 minutos</option>
+                <option value="1.5">1.5: > 480 minutos (Horas extra)</option>
+            </select>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    function calcular() {
+        const fr = parseFloat(document.getElementById('fr').value);
+        const ff = parseFloat(document.getElementById('ff').value);
+        const ffz = parseFloat(document.getElementById('ffz').value);
+        const fp = parseFloat(document.getElementById('fp').value);
+        const fa = parseFloat(document.getElementById('fa').value);
+        const md = parseFloat(document.getElementById('md').value);
+
+        // Fórmula ICKL = (FR + FF + FFz + FP + FA) * MD
+        const ickl = (fr + ff + ffz + fp + fa) * md;
+        
+        document.getElementById('score').innerText = ickl.toFixed(1);
+        
+        let status = "Óptimo", clase = "level-optimo", border = "#27ae60";
+
+        if (ickl > 22) { status = "Riesgo Alto"; clase = "level-alto"; border = "#c0392b"; }
+        else if (ickl > 14) { status = "Riesgo Medio"; clase = "level-medio"; border = "#e67e22"; }
+        else if (ickl > 11) { status = "Riesgo Bajo"; clase = "level-bajo"; border = "#f39c12"; }
+        else if (ickl > 9) { status = "Riesgo Muy Bajo"; clase = "level-muy-bajo"; border = "#f1c40f"; }
+        else if (ickl > 7.5) { status = "Aceptable"; clase = "level-aceptable"; border = "#2ecc71"; }
+
+        const statusBadge = document.getElementById('status');
+        statusBadge.innerText = status;
+        statusBadge.className = "status-badge " + clase;
+        document.getElementById('panel-color').style.borderLeftColor = border;
+    }
+
+    window.onload = calcular;
+</script>
+
+</body>
+</html>

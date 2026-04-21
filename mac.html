@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Herramienta Ergonómica MAC - Completa</title>
+    <style>
+        :root { --primary: #059669; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --border: #e2e8f0; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 800px; background: var(--card); padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid var(--border); }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        .menu-grid { display: grid; grid-template-columns: 1fr; gap: 15px; }
+        .btn-menu { padding: 20px; border: 2px solid var(--primary); border-radius: 15px; background: white; color: var(--primary); font-weight: 700; cursor: pointer; transition: 0.3s; font-size: 1rem; }
+        .btn-menu:hover { background: var(--primary); color: white; }
+        .section { display: none; }
+        .input-group { margin-bottom: 12px; padding: 12px; background: #f1f5f9; border-radius: 10px; }
+        label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; color: #334155; }
+        select, input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.9rem; box-sizing: border-box; }
+        .btn-calc { width: 100%; background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 20px; }
+        .btn-back { background: #64748b; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; margin-bottom: 20px; }
+        .result-panel { margin-top: 25px; padding: 25px; border-radius: 15px; text-align: center; display: none; }
+        .score-box { font-size: 3.5rem; font-weight: 800; margin: 10px 0; }
+        .green { background: #dcfce7; color: #166534; }
+        .amber { background: #fef9c3; color: #854d0e; }
+        .red { background: #fee2e2; color: #991b1b; }
+        .purple { background: #f3e8ff; color: #6b21a8; }
+    </style>
+</head>
+<body>
+<div class="container">
+<button style="padding:10px 20px;  color:white; border:none; border-radius:5px;">
+ <a href="principal.html">Regresar al menú</a>
+</button>
+
+<div class="container">
+    <div id="main-menu">
+        <h2>Evaluación MAC (HSE)</h2>
+        <div class="menu-grid">
+            <button class="btn-menu" onclick="openEval('lifting')">Levantamiento Individual</button>
+            <button class="btn-menu" onclick="openEval('carrying')">Caminar con Carga (Transporte)</button>
+            <button class="btn-menu" onclick="openEval('team')">Carga en Equipo</button>
+        </div>
+    </div>
+
+    <div id="lifting" class="section">
+        <button class="btn-back" onclick="showMenu()">← Volver</button>
+        <h2>Levantamiento Individual</h2>
+        <div class="input-group"><label>Peso de la carga (kg)</label><input type="number" id="L_peso" value="10"></div>
+        <div class="input-group"><label>Frecuencia</label><select id="L_frec"><option value="baja">Baja (1/min o menos)</option><option value="media">Media (5-8/min)</option><option value="alta">Alta (12+/min)</option></select></div>
+        <div class="input-group"><label>Distancia horizontal (Manos a Espalda)</label><select id="L_dist"><option value="0">Carga pegada al cuerpo</option><option value="3">Brazos algo extendidos</option><option value="6">Brazos muy extendidos</option></select></div>
+        <div class="input-group"><label>Zona vertical</label><select id="L_zone"><option value="0">Cadera a nudillos</option><option value="1">Rodillas o hombros</option><option value="3">Suelo o sobre cabeza</option></select></div>
+        <div class="input-group"><label>Giro de torso y lateralización</label><select id="L_torsion"><option value="0">Sin giro ni inclinación</option><option value="1">Giro o inclinación leve</option><option value="2">Giro o inclinación severa</option></select></div>
+        <div class="input-group"><label>Restricción postural</label><select id="L_restr"><option value="0">Movimiento libre</option><option value="1">Postura restringida</option><option value="3">Postura muy restringida</option></select></div>
+        <div class="input-group"><label>Agarre</label><select id="L_agarre"><option value="0">Bueno (Asas/Agarre firme)</option><option value="1">Regular (Sin asas/Asible)</option><option value="2">Malo (Inestable/Difícil)</option></select></div>
+        <div class="input-group"><label>Superficie de piso</label><select id="L_piso"><option value="0">Seco y firme</option><option value="1">Húmedo o irregular</option><option value="2">Resbaladizo o dañado</option></select></div>
+        <div class="input-group"><label>Factor ambiental</label><select id="L_env"><option value="0">Sin factores adversos</option><option value="1">Hay un factor</option><option value="2">Dos o más factores</option></select></div>
+        <button class="btn-calc" onclick="calcularTotal('lifting')">CALCULAR</button>
+    </div>
+
+    <div id="carrying" class="section">
+        <button class="btn-back" onclick="showMenu()">← Volver</button>
+        <h2>Caminar con Carga (Transporte)</h2>
+        <div class="input-group"><label>Peso de la carga (kg)</label><input type="number" id="C_peso" value="10"></div>
+        <div class="input-group"><label>Frecuencia</label><select id="C_frec"><option value="baja">Baja</option><option value="media">Media</option><option value="alta">Alta</option></select></div>
+        <div class="input-group"><label>Distancia horizontal (Manos a Espalda)</label><select id="C_dist"><option value="0">Pegada al cuerpo</option><option value="3">Algo extendidos</option><option value="6">Muy extendidos</option></select></div>
+        <div class="input-group"><label>Asimetría del torso y carga</label><select id="C_asym"><option value="0">Carga equilibrada/Simétrica</option><option value="1">Asimetría leve</option><option value="2">Asimetría severa</option></select></div>
+        <div class="input-group"><label>Restricción postural</label><select id="C_restr"><option value="0">Sin restricciones</option><option value="1">Paso algo obstruido</option><option value="3">Espacio muy confinado</option></select></div>
+        <div class="input-group"><label>Agarre</label><select id="C_agarre"><option value="0">Bueno</option><option value="1">Regular</option><option value="2">Malo</option></select></div>
+        <div class="input-group"><label>Superficie de piso</label><select id="C_piso"><option value="0">Seco y firme</option><option value="1">Irregular/Húmedo</option><option value="2">Resbaladizo/Dañado</option></select></div>
+        <div class="input-group"><label>Distancia del transporte</label><select id="C_tdist"><option value="0">2m - 4m</option><option value="1">4m - 10m</option><option value="2">Más de 10m</option></select></div>
+        <div class="input-group"><label>Obstáculos en la ruta</label><select id="C_obs"><option value="0">Ninguno</option><option value="2">Pendiente o un obstáculo</option><option value="3">Escaleras o múltiples obstáculos</option></select></div>
+        <div class="input-group"><label>Factor ambiental</label><select id="C_env"><option value="0">Ninguno</option><option value="1">Un factor</option><option value="2">Dos o más</option></select></div>
+        <button class="btn-calc" onclick="calcularTotal('carrying')">CALCULAR</button>
+    </div>
+
+    <div id="team" class="section">
+        <button class="btn-back" onclick="showMenu()">← Volver</button>
+        <h2>Carga en Equipo</h2>
+        <div class="input-group"><label>Peso total de la carga (kg)</label><input type="number" id="T_peso" value="20"></div>
+        <div class="input-group"><label>Número de personas</label><input type="number" id="T_num" value="2"></div>
+        <div class="input-group"><label>Distancia horizontal</label><select id="T_dist"><option value="0">Cerca del cuerpo</option><option value="3">Moderada</option><option value="6">Muy extendida</option></select></div>
+        <div class="input-group"><label>Distancia vertical</label><select id="T_vdist"><option value="0">Cadera a nudillos</option><option value="1">Rodillas o hombros</option><option value="3">Suelo o sobre cabeza</option></select></div>
+        <div class="input-group"><label>Torsión y lateralización</label><select id="T_torsion"><option value="0">Ninguna</option><option value="1">Leve</option><option value="2">Severa</option></select></div>
+        <div class="input-group"><label>Restricción postural</label><select id="T_restr"><option value="0">Sin restricciones</option><option value="1">Restringida</option><option value="3">Muy restringida</option></select></div>
+        <div class="input-group"><label>Agarre</label><select id="T_agarre"><option value="0">Bueno</option><option value="1">Regular</option><option value="2">Malo</option></select></div>
+        <div class="input-group"><label>Superficie de piso</label><select id="T_piso"><option value="0">Firme y seco</option><option value="1">Irregular</option><option value="2">Resbaladizo</option></select></div>
+        <div class="input-group"><label>Factor ambiental</label><select id="T_env"><option value="0">Sin factores</option><option value="1">Un factor</option><option value="2">Dos o más</option></select></div>
+        <div class="input-group"><label>Coordinación y control</label><select id="T_coord"><option value="0">Buena</option><option value="1">Regular</option><option value="3">Mala/Pobre</option></select></div>
+        <button class="btn-calc" onclick="calcularTotal('team')">CALCULAR</button>
+    </div>
+
+    <div id="resPanel" class="result-panel">
+        <div id="nivel_texto" style="font-weight: 800; font-size: 1.2rem;"></div>
+        <div id="total_score" class="score-box">0</div>
+        <div id="msg" style="font-size: 0.9rem; font-weight: 600;"></div>
+    </div>
+</div>
+
+<script>
+    function openEval(id) {
+        document.getElementById('main-menu').style.display = 'none';
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        document.getElementById(id).style.display = 'block';
+        document.getElementById('resPanel').style.display = 'none';
+    }
+
+    function showMenu() {
+        document.getElementById('main-menu').style.display = 'block';
+        document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+        document.getElementById('resPanel').style.display = 'none';
+    }
+
+    function getPesoScore(peso, frec, type) {
+        if (type === 'team') {
+            let pPersona = peso / (parseInt(document.getElementById('T_num').value) || 2);
+            if (pPersona >= 35) return 10;
+            if (pPersona >= 20) return 6;
+            if (pPersona >= 10) return 4;
+            return 0;
+        }
+        if (peso >= 25) return 10;
+        if (peso >= 20) return (frec === 'alta') ? 10 : 6;
+        if (peso >= 10) return (frec === 'baja') ? 4 : 6;
+        return (frec === 'alta') ? 4 : 0;
+    }
+
+    function calcularTotal(type) {
+        let total = 0;
+        if (type === 'lifting') {
+            total = getPesoScore(parseFloat(document.getElementById('L_peso').value), document.getElementById('L_frec').value, 'ind') +
+                    parseInt(document.getElementById('L_dist').value) +
+                    parseInt(document.getElementById('L_zone').value) +
+                    parseInt(document.getElementById('L_torsion').value) +
+                    parseInt(document.getElementById('L_restr').value) +
+                    parseInt(document.getElementById('L_agarre').value) +
+                    parseInt(document.getElementById('L_piso').value) +
+                    parseInt(document.getElementById('L_env').value);
+        } else if (type === 'carrying') {
+            total = getPesoScore(parseFloat(document.getElementById('C_peso').value), document.getElementById('C_frec').value, 'ind') +
+                    parseInt(document.getElementById('C_dist').value) +
+                    parseInt(document.getElementById('C_asym').value) +
+                    parseInt(document.getElementById('C_restr').value) +
+                    parseInt(document.getElementById('C_agarre').value) +
+                    parseInt(document.getElementById('C_piso').value) +
+                    parseInt(document.getElementById('C_tdist').value) +
+                    parseInt(document.getElementById('C_obs').value) +
+                    parseInt(document.getElementById('C_env').value);
+        } else if (type === 'team') {
+            total = getPesoScore(parseFloat(document.getElementById('T_peso').value), '', 'team') +
+                    parseInt(document.getElementById('T_dist').value) +
+                    parseInt(document.getElementById('T_vdist').value) +
+                    parseInt(document.getElementById('T_torsion').value) +
+                    parseInt(document.getElementById('T_restr').value) +
+                    parseInt(document.getElementById('T_agarre').value) +
+                    parseInt(document.getElementById('T_piso').value) +
+                    parseInt(document.getElementById('T_env').value) +
+                    parseInt(document.getElementById('T_coord').value);
+        }
+
+        const panel = document.getElementById("resPanel");
+        panel.style.display = "block";
+        document.getElementById("total_score").innerText = total;
+
+        const nivel = document.getElementById("nivel_texto");
+        const msg = document.getElementById("msg");
+
+        if (total <= 4) { panel.className = "result-panel green"; nivel.innerText = "RIESGO BAJO"; msg.innerText = "No se requiere acción inmediata."; }
+        else if (total <= 12) { panel.className = "result-panel amber"; nivel.innerText = "RIESGO MODERADO"; msg.innerText = "Examinar la tarea próximamente."; }
+        else if (total <= 20) { panel.className = "result-panel red"; nivel.innerText = "RIESGO ALTO"; msg.innerText = "Modificar el puesto de trabajo pronto."; }
+        else { panel.className = "result-panel purple"; nivel.innerText = "RIESGO MUY ALTO"; msg.innerText = "Intervención técnica inmediata necesaria."; }
+    }
+</script>
+</body>
+</html>

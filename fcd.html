@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> FCD </title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --bg: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+        }
+
+        .input-section {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--primary);
+        }
+
+        input, select {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .btn-calc {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.3s;
+            font-size: 16px;
+        }
+
+        .btn-calc:hover { background: var(--accent); }
+
+        .results {
+            margin-top: 25px;
+            display: none;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background: #fff;
+        }
+
+        .term-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .term-box {
+            background: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            border: 1px solid #eee;
+        }
+
+        .total-box {
+            text-align: center;
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .footer {
+            margin-top: 30px;
+            font-size: 11px;
+            color: #7f8c8d;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<a href="principal.html" class="btn-regresar">← VOLVER AL INICIO</a>
+<div class="container">
+    <header>
+        <h2 style="margin:0">Fuerza de Compresión (FCD)</h2>
+          </header>
+
+    <div class="input-section">
+        <div class="form-group">
+            <label>Peso Corporal (BW):</label>
+            <input type="number" id="bw" placeholder=" Libras (lb)">
+        </div>
+
+        <div class="form-group">
+            <label>Carga (L):</label>
+            <input type="number" id="load" placeholder=" Libras (lb)">
+        </div>
+
+        <div class="form-group">
+            <label>Distancia Horizontal:</label>
+            <input type="number" id="hb" placeholder=pulgadas (in)">
+        </div>
+
+        <div class="form-group">
+            <label>Postura (Ángulo desde Vertical):</label>
+            <select id="posture">
+                <option value="0.0">Vertical (0.0 sinθ)</option>
+                <option value="0.4">Inclinado 1/4 (0.4 sinθ)</option>
+                <option value="0.7">Inclinado 1/2 (0.7 sinθ)</option>
+                <option value="0.9">Inclinado 3/4 (0.9 sinθ)</option>
+                <option value="1.0">Horizontal (1.0 sinθ)</option>
+            </select>
+        </div>
+    </div>
+
+    <button class="btn-calc" onclick="calcularFCD()">CALCULAR </button>
+
+    <div id="results" class="results">
+        <div class="term-grid">
+            <div class="term-box"><b>Término A</b><br>(Postura)<br><span id="termA">0</span> lb</div>
+            <div class="term-box"><b>Término B</b><br>(Carga)<br><span id="termB">0</span> lb</div>
+            <div class="term-box"><b>Término C</b><br>(Directa)<br><span id="termC">0</span> lb</div>
+        </div>
+        
+        <div id="totalBox" class="total-box">
+             <span id="totalVal" style="font-size: 26px;">0</span> lb
+        </div>
+        
+        <div id="msg" style="font-size: 13px; margin-top: 15px; text-align: justify; padding: 10px; border: 1px solid #eee;"></div>
+    </div>
+
+   </div>
+
+<script>
+    function calcularFCD() {
+        // Entradas directas en lb e in según el formato 
+        const bw = parseFloat(document.getElementById('bw').value);
+        const l = parseFloat(document.getElementById('load').value);
+        const hb = parseFloat(document.getElementById('hb').value);
+        const sinTheta = parseFloat(document.getElementById('posture').value);
+
+        if (isNaN(bw) || isNaN(l) || isNaN(hb)) {
+            alert("Por favor, ingrese todos los valores.");
+            return;
+        }
+
+        // Fórmulas exactas del formato de Bloswick 
+        const A = 3 * bw * sinTheta;
+        const B = 0.5 * (l * hb);
+        const C = 0.8 * ((bw / 2) + l);
+        const Fc = A + B + C;
+
+        // Mostrar resultados
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('termA').innerText = Math.round(A);
+        document.getElementById('termB').innerText = Math.round(B);
+        document.getElementById('termC').innerText = Math.round(C);
+        document.getElementById('totalVal').innerText = Math.round(Fc);
+
+        const totalBox = document.getElementById('totalBox');
+        const msg = document.getElementById('msg');
+
+        // Límite de comparación sugerido: 700 lb 
+        if (Fc > 700) {
+            totalBox.style.backgroundColor = "#e74c3c";
+            msg.innerHTML = "<b>ESTADO: RIESGO.</b> La fuerza excede las 700 lb. Se recomienda rediseño o análisis detallado.";
+        } else {
+            totalBox.style.backgroundColor = "#27ae60";
+            msg.innerHTML = "<b>ESTADO: SEGURO.</b> El valor estimado es menor al límite de comparación de 700 lb.";
+        }
+
+        // Identificación del contribuyente mayor
+        let maxVal = Math.max(A, B, C);
+        let guia = "<br><br><b>Prioridad de Rediseño:</b> ";
+        if (maxVal === A) guia += "Reducir el ángulo del torso .";
+        else if (maxVal === B) guia += "Reducir la carga o la distancia horizontal HB .";
+        else guia += "Reducir la magnitud de la carga.";
+        
+        msg.innerHTML += guia;
+    }
+</script>
+
+</body>
+</html>

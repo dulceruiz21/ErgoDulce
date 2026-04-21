@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> RAPP </title>
+    <style>
+        :root { 
+            --primary: #2c3e50; 
+            --accent-a: #27ae60; 
+            --accent-b: #2980b9; 
+            --bg: #f4f7f6; 
+        }
+        body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); padding: 20px; color: #333; }
+        .container { background: white; max-width: 900px; margin: 0 auto; padding: 30px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        header { text-align: center; border-bottom: 3px solid var(--primary); margin-bottom: 25px; padding-bottom: 10px; }
+        
+        .main-nav { display: flex; gap: 15px; margin-bottom: 30px; }
+        .nav-btn { flex: 1; padding: 15px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; transition: 0.3s; background: #dfe6e9; }
+        .nav-btn.active-a { background: var(--accent-a); color: white; }
+        .nav-btn.active-b { background: var(--accent-b); color: white; }
+
+        .section-panel { display: none; }
+        .section-panel.active { display: block; }
+
+        .group-title { background: #ecf0f1; padding: 10px; border-radius: 5px; margin: 20px 0 10px; font-weight: bold; border-left: 5px solid var(--primary); }
+        .risk-item { display: flex; flex-direction: column; padding: 12px; border-bottom: 1px solid #eee; gap: 5px; }
+        .risk-item label { font-size: 14px; font-weight: 700; color: var(--primary); }
+        .help-text { font-size: 12px; color: #666; font-style: italic; margin-bottom: 5px; }
+        
+        select { padding: 10px; border-radius: 8px; border: 1px solid #ddd; width: 100%; background: #fff; font-size: 14px; }
+        
+        .btn-eval { color: white; border: none; padding: 20px; border-radius: 10px; width: 100%; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 25px; }
+        .btn-a { background: var(--accent-a); }
+        .btn-b { background: var(--accent-b); }
+
+        .result-card { margin-top: 30px; display: none; padding: 25px; border-radius: 12px; border: 2px solid #ddd; text-align: center; }
+        .score-display { font-size: 48px; font-weight: bold; margin: 10px 0; }
+        
+        .footer { margin-top: 40px; text-align: center; font-size: 12px; color: #7f8c8d; border-top: 1px solid #eee; padding-top: 20px; }
+    </style>
+</head>
+<body>
+<a href="principal.html" class="btn-regresar">← VOLVER AL INICIO</a>
+<div class="container">
+    <header>
+        <h1> Evaluación RAPP</h1>
+    
+    </header>
+
+    <div class="main-nav">
+        <button class="nav-btn active-a" id="btnTabA" onclick="switchTab('A')">SECCIÓN A<br><small>Con Equipo (Ruedas)</small></button>
+        <button class="nav-btn" id="btnTabB" onclick="switchTab('B')">SECCIÓN B<br><small>Sin Equipo (Manual)</small></button>
+    </div>
+
+    <div id="panelA" class="section-panel active">
+        <div class="group-title">A-1 Carga y Equipo</div>
+        <div class="risk-item">
+            <label>Tipo de equipo:</label>
+            <select id="eqTipoA" onchange="loadWeightsA()">
+                <option value="pequeno">Pequeño (1-2 ruedas: carretillas, botes con ruedas)</option>
+                <option value="mediano">Mediano (3+ ruedas: jaulas, contenedores euro)</option>
+                <option value="grande">Grande / Rieles (Transpaletas, sistemas aéreos)</option>
+            </select>
+        </div>
+        <div class="risk-item">
+            <label>Peso total movido (kg):</label>
+            <select id="a1_peso" class="valA"></select>
+        </div>
+
+        <div class="group-title">Factores de Riesgo</div>
+        <div class="risk-item"><label>A-2 Postura:</label>
+            <select class="valA">
+                <option value="0">G/0: Torso erguido, sin torsión ni inclinación lateral</option>
+                <option value="3">A/3: Inclinación o torsión notable del tronco</option>
+                <option value="6">R/6: Postura extrema, cuclillas o empuje con espalda</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>A-3 Agarre:</label>
+            <select class="valA">
+                <option value="0">G/0: Asas que permiten agarre potente y cómodo</option>
+                <option value="1">A/1: Agarre parcial (dedos a 90°) o contacto parcial</option>
+                <option value="2">R/2: Sin asas, bordes afilados o contacto incómodo</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>A-4 Patrón de Trabajo:</label>
+            <select class="valA">
+                <option value="0">G/0: Ritmo propio con pausas frecuentes</option>
+                <option value="1">A/1: Repetitivo con algunas pausas o rotación</option>
+                <option value="3">R/3: Repetitivo sin descansos ni rotación</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>A-5 Distancia:</label>
+            <select class="valA">
+                <option value="0">G/0: 10m o menos</option>
+                <option value="1">A/1: 10m a 30m</option>
+                <option value="3">R/3: Más de 30m</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>A-6 Estado del Equipo:</label>
+            <select class="valA">
+                <option value="0">G/0: Mantenimiento preventivo, buen estado</option>
+                <option value="2">A/2: Mantenimiento solo correctivo, estado aceptable</option>
+                <option value="4">R/4: Mal estado, ruedas dañadas o sin mantenimiento</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>A-7 Superficie del Suelo:</label>
+            <select class="valA">
+                <option value="0">G/0: Seco, limpio y nivelado</option>
+                <option value="1">A/1: Pendiente suave (3-5°) o algo de escombros</option>
+                <option value="4">R/4: Resbaladizo, pendiente fuerte (>5°) o inestable</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>A-8 Obstáculos en Ruta:</label>
+            <select class="valA">
+                <option value="0">G/0: Ruta libre de obstáculos</option>
+                <option value="2">A/2: Un solo tipo de obstáculo (sin rampas/escalones)</option>
+                <option value="3">R/3: Varios tipos de obstáculos, rampas o escalones</option>
+            </select>
+        </div>
+        <div class="risk-item">
+            <label>A-9 Otros Factores:</label>
+            <span class="help-text">Estabilidad, visibilidad, iluminación, clima, EPP.</span>
+            <select class="valA">
+                <option value="0">G/0: Ningún factor adicional presente</option>
+                <option value="1">A/1: Un factor presente (ej. visibilidad obstruida)</option>
+                <option value="2">R/2: Dos o más factores presentes</option>
+            </select>
+        </div>
+
+        <button class="btn-eval btn-a" onclick="calculate('A')">EVALUAR SECCIÓN A</button>
+    </div>
+
+    <div id="panelB" class="section-panel">
+        <div class="group-title">B-1 Carga Manual</div>
+        <div class="risk-item">
+            <label>Tipo de actividad:</label>
+            <select id="actTipoB" onchange="loadWeightsB()">
+                <option value="rodado">Laminación / Rodado</option>
+                <option value="pivotado">Pivotado (Agitación / Bordes)</option>
+                <option value="arrastre">Arrastrar / Deslizar / Tirar</option>
+            </select>
+        </div>
+        <div class="risk-item">
+            <label>Peso de la carga (kg):</label>
+            <select id="b1_peso" class="valB"></select>
+        </div>
+
+        <div class="group-title">Factores de Riesgo</div>
+        <div class="risk-item"><label>B-2 Postura:</label>
+            <select class="valB">
+                <option value="0">G/0: Torso erguido, manos entre cadera y hombros</option>
+                <option value="3">A/3: Inclinación o torsión notable</option>
+                <option value="6">R/6: Muy inclinado, en cuclillas o empuje con espalda</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>B-3 Agarre:</label>
+            <select class="valB">
+                <option value="0">G/0: Agarre cómodo y potente</option>
+                <option value="1">A/1: Agarre parcial (dedos a 90°)</option>
+                <option value="2">R/2: Sin agarres, bordes afilados o incómodo</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>B-4 Patrón de Trabajo:</label>
+            <select class="valB">
+                <option value="0">G/0: No repetitivo, ritmo propio</option>
+                <option value="1">A/1: Repetitivo con pausas o rotación</option>
+                <option value="3">R/3: Repetitivo sin descansos posibles</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>B-5 Distancia:</label>
+            <select class="valB">
+                <option value="0">G/0: 2m o menos</option>
+                <option value="1">A/1: Entre 2m y 10m</option>
+                <option value="3">R/3: Más de 10m</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>B-6 Superficie del Suelo:</label>
+            <select class="valB">
+                <option value="0">G/0: Seco, firme y nivelado</option>
+                <option value="1">A/1: Alfombrado, algo irregular o pendiente suave</option>
+                <option value="4">R/4: Pendiente fuerte, suelo inestable o resbaladizo</option>
+            </select>
+        </div>
+        <div class="risk-item"><label>B-7 Obstáculos en Ruta:</label>
+            <select class="valB">
+                <option value="0">G/0: Ruta libre</option>
+                <option value="2">A/2: Un solo obstáculo (puerta, curva cerrada)</option>
+                <option value="3">R/3: Escalones, rampas empinadas o varios obstáculos</option>
+            </select>
+        </div>
+        <div class="risk-item">
+            <label>B-8 Otros Factores:</label>
+            <span class="help-text">Estabilidad, visibilidad, temperaturas extremas, EPP.</span>
+            <select class="valB">
+                <option value="0">G/0: Ningún factor adicional presente</option>
+                <option value="1">A/1: Un factor presente</option>
+                <option value="2">R/2: Dos o más factores presentes</option>
+            </select>
+        </div>
+
+        <button class="btn-eval btn-b" onclick="calculate('B')">EVALUAR SECCIÓN B</button>
+    </div>
+
+    <div id="resCard" class="result-card">
+        <h3 id="resTitle">Puntuación Total RAPP</h3>
+        <div id="scoreVal" class="score-display">0</div>
+        <p id="resMsg"></p>
+    </div>
+</div>
+
+<script>
+    const dataA = {
+        pequeno: [{v:0,t:"< 50kg"}, {v:2,t:"50-100kg"}, {v:4,t:"100-200kg"}, {v:8,t:"> 200kg"}, {v:99,t:"Inaceptable"}],
+        mediano: [{v:0,t:"< 250kg"}, {v:2,t:"250-500kg"}, {v:4,t:"500-750kg"}, {v:8,t:"> 750kg"}, {v:99,t:"Inaceptable"}],
+        grande: [{v:0,t:"< 600kg"}, {v:2,t:"600-1000kg"}, {v:4,t:"1000-1500kg"}, {v:8,t:"> 1500kg"}, {v:99,t:"Inaceptable"}]
+    };
+
+    const dataB = {
+        rodado: [{v:0,t:"< 400kg"}, {v:2,t:"400-600kg"}, {v:4,t:"600-1000kg"}, {v:8,t:"> 1000kg"}],
+        pivotado: [{v:0,t:"< 80kg"}, {v:2,t:"80-120kg"}, {v:4,t:"120-150kg"}, {v:8,t:"> 150kg"}],
+        arrastre: [{v:0,t:"< 25kg"}, {v:2,t:"25-50kg"}, {v:4,t:"50-80kg"}, {v:8,t:"> 80kg"}]
+    };
+
+    function switchTab(type) {
+        document.getElementById('panelA').classList.toggle('active', type === 'A');
+        document.getElementById('panelB').classList.toggle('active', type === 'B');
+        document.getElementById('btnTabA').className = type === 'A' ? 'nav-btn active-a' : 'nav-btn';
+        document.getElementById('btnTabB').className = type === 'B' ? 'nav-btn active-b' : 'nav-btn';
+        document.getElementById('resCard').style.display = 'none';
+    }
+
+    function loadWeightsA() {
+        const t = document.getElementById('eqTipoA').value;
+        document.getElementById('a1_peso').innerHTML = dataA[t].map(p => `<option value="${p.v}">${p.t} (${p.v==99?'P':p.v})</option>`).join('');
+    }
+
+    function loadWeightsB() {
+        const t = document.getElementById('actTipoB').value;
+        document.getElementById('b1_peso').innerHTML = dataB[t].map(p => `<option value="${p.v}">${p.t} (${p.v})</option>`).join('');
+    }
+
+    function calculate(type) {
+        let total = 0, fail = false;
+        document.querySelectorAll(type === 'A' ? '.valA' : '.valB').forEach(i => {
+            if(i.value == 99) fail = true;
+            else total += parseInt(i.value);
+        });
+
+        const card = document.getElementById('resCard');
+        card.style.display = 'block';
+        const msg = document.getElementById('resMsg');
+        
+        if(fail) {
+            document.getElementById('scoreVal').innerText = "P";
+            msg.innerHTML = "<strong>INACEPTABLE:</strong> La carga excede la capacidad nominal recomendada.";
+            card.style.borderColor = "#8e44ad";
+        } else {
+            document.getElementById('scoreVal').innerText = total;
+            if(total >= 12) {
+                msg.innerText = "RIESGO MUY ALTO: Acción inmediata necesaria.";
+                card.style.borderColor = "red";
+            } else if(total >= 7) {
+                msg.innerText = "RIESGO ALTO: Se debe investigar y mejorar pronto.";
+                card.style.borderColor = "orange";
+            } else {
+                msg.innerText = "RIESGO BAJO/MEDIO: Tarea bajo control.";
+                card.style.borderColor = "green";
+            }
+        }
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    loadWeightsA();
+    loadWeightsB();
+</script>
+</body>
+</html>

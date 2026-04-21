@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title> NIOSH</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            border: 1px solid var(--border);
+        }
+
+        h2 { text-align: center; color: var(--primary); margin-bottom: 25px; }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            margin-bottom: 5px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            transition: border 0.3s;
+        }
+
+        input:focus { border-color: var(--primary); outline: none; }
+
+        button {
+            width: 100%;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        button:hover { background: #1d4ed8; }
+        button:active { transform: scale(0.98); }
+
+        /* Desglose de Factores */
+        .factors-display {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .factor-box {
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .f-label { font-size: 0.65rem; color: var(--text-light); font-weight: 800; display: block; }
+        .f-val { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
+
+        /* Resultado Final */
+        .result-section {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            display: none;
+        }
+
+        .li-score { font-size: 3rem; font-weight: 800; line-height: 1; margin: 10px 0; }
+        .safe { background: #dcfce7; color: #166534; }
+        .caution { background: #fef9c3; color: #854d0e; }
+        .danger { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+<div class="container">
+<button style="padding:10px 20px;  color:white; border:none; border-radius:5px;">
+ <a href="principal.html">Regresar al menú</a>
+</button>
+
+<div class="container">
+    <h2> NIOSH</h2>
+    
+    <div class="input-grid">
+        <div class="input-group">
+            <label>Dist. Horizontal (H)</label>
+            <input type="number" id="H" placeholder="cm" value="30">
+        </div>
+        <div class="input-group">
+            <label>Alt. Vertical (V)</label>
+            <input type="number" id="V" placeholder="cm" value="75">
+        </div>
+        <div class="input-group">
+            <label>Desplazamiento (D)</label>
+            <input type="number" id="D" placeholder="cm" value="40">
+        </div>
+        <div class="input-group">
+            <label>Asimetría (A)</label>
+            <input type="number" id="A" placeholder="grados" value="0">
+        </div>
+        <div class="input-group">
+            <label>Frecuencia (F)</label>
+            <input type="number" id="F" placeholder="lev/min" value="1">
+        </div>
+        <div class="input-group">
+            <label>Peso Real (L)</label>
+            <input type="number" id="L" placeholder="kg" value="10">
+        </div>
+    </div>
+
+    <div class="input-grid">
+        <div class="input-group">
+            <label>Duración</label>
+            <select id="dur">
+                <option value="corta">Corta (≤1h)</option>
+                <option value="media">Media (1-2h)</option>
+                <option value="larga">Larga (2-8h)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Agarre</label>
+            <select id="agarre">
+                <option value="bueno">Bueno</option>
+                <option value="regular">Regular</option>
+                <option value="malo">Malo</option>
+            </select>
+        </div>
+    </div>
+
+    <button onclick="calcular()">CALCULAR EVALUACIÓN</button>
+
+    <div id="resArea" style="display:none;">
+        <div class="factors-display">
+            <div class="factor-box"><span class="f-label">HM</span><span id="v_hm" class="f-val"></span></div>
+            <div class="factor-box"><span class="f-label">VM</span><span id="v_vm" class="f-val"></span></div>
+            <div class="factor-box"><span class="f-label">DM</span><span id="v_dm" class="f-val"></span></div>
+            <div class="factor-box"><span class="f-label">AM</span><span id="v_am" class="f-val"></span></div>
+            <div class="factor-box"><span class="f-label">FM</span><span id="v_fm" class="f-val"></span></div>
+            <div class="factor-box"><span class="f-label">CM</span><span id="v_cm" class="f-val"></span></div>
+        </div>
+
+        <div id="statusCard" class="result-section">
+            <span style="font-size: 0.8rem; font-weight: 700;">ÍNDICE DE LEVANTAMIENTO (LI)</span>
+            <div id="li_val" class="li-score">0.00</div>
+            <div id="rwl_val" style="font-weight: 600;">RWL: 0.00 kg</div>
+            <div id="msg" style="margin-top: 10px; font-weight: 800; text-transform: uppercase;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcular() {
+        // Entradas
+        const h = parseFloat(document.getElementById("H").value);
+        const v = parseFloat(document.getElementById("V").value);
+        const d_input = parseFloat(document.getElementById("D").value);
+        const a = parseFloat(document.getElementById("A").value);
+        const f = parseFloat(document.getElementById("F").value);
+        const l = parseFloat(document.getElementById("L").value);
+        const dur = document.getElementById("dur").value;
+        const ag = document.getElementById("agarre").value;
+
+        // 1. HM (Horizontal) - Límite NIOSH: máx 63cm
+        let HM = (h <= 25) ? 1 : (h > 63 ? 0 : 25 / h);
+
+        // 2. VM (Vertical) - Límite NIOSH: máx 175cm
+        let VM = (v > 175) ? 0 : (1 - 0.003 * Math.abs(v - 75));
+        if (VM < 0) VM = 0;
+
+        // 3. DM (Desplazamiento) - Límite NIOSH: mín 25cm, máx 175cm
+        let d_calc = (d_input < 25) ? 25 : d_input;
+        let DM = (d_input > 175) ? 0 : (0.82 + (4.5 / d_calc));
+
+        // 4. AM (Asimetría) : máx 135°
+        let AM = (a > 135) ? 0 : (1 - 0.0032 * a);
+        if (AM < 0) AM = 0;
+
+        // 5. FM (Frecuencia)  = 1.0;
+        if (dur === "corta") FM = (f <= 1) ? 0.94 : (f <= 4 ? 0.84 : 0.50);
+        else if (dur === "media") FM = (f <= 1) ? 0.88 : (f <= 4 ? 0.72 : 0.30);
+        else FM = (f <= 1) ? 0.75 : (f <= 4 ? 0.45 : 0.10);
+        if (f > 15) FM = 0;
+
+        // 6. CM (Agarre)
+        let CM = (ag === "bueno") ? 1.0 : (ag === "regular" ? (v < 75 ? 0.95 : 1.0) : 0.90);
+
+        // Cálculo Final
+        const RWL = 23 * HM * VM * DM * AM * FM * CM;
+        const LI = (RWL > 0) ? (l / RWL) : Infinity;
+
+        // Mostrar en UI
+        document.getElementById("resArea").style.display = "block";
+        document.getElementById("v_hm").innerText = HM.toFixed(2);
+        document.getElementById("v_vm").innerText = VM.toFixed(2);
+        document.getElementById("v_dm").innerText = DM.toFixed(2);
+        document.getElementById("v_am").innerText = AM.toFixed(2);
+        document.getElementById("v_fm").innerText = FM.toFixed(2);
+        document.getElementById("v_cm").innerText = CM.toFixed(2);
+
+        document.getElementById("li_val").innerText = isFinite(LI) ? LI.toFixed(2) : "ERR";
+        document.getElementById("rwl_val").innerText = "RWL Recomendado: " + (RWL > 0 ? RWL.toFixed(2) : 0) + " kg";
+
+        const card = document.getElementById("statusCard");
+        const msg = document.getElementById("msg");
+        card.style.display = "block";
+
+        if (LI <= 1) {
+            card.className = "result-section safe";
+            msg.innerText = "Riesgo Aceptable";
+        } else if (LI <= 3) {
+            card.className = "result-section caution";
+            msg.innerText = "Riesgo Moderado";
+        } else {
+            card.className = "result-section danger";
+            msg.innerText = "Riesgo Alto / Peligro";
+        }
+    }
+</script>
+</body>
+</html>

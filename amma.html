@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación AMMA </title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #8e44ad;
+            --bg: #f4f7f6;
+            --white: #ffffff;
+            --border: #dcdde1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--primary);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background: var(--white);
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        header {
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: 0.5px;
+            color: var(--primary);
+        }
+
+        .instructions {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #636e72;
+            margin-bottom: 25px;
+            border-left: 4px solid var(--accent);
+        }
+
+        .amma-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .symptom-card {
+            padding: 15px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .symptom-card:hover {
+            border-color: var(--accent);
+            background-color: #fafafa;
+        }
+
+        .symptom-card label {
+            font-weight: 600;
+            font-size: 15px;
+        }
+
+        select {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        select:focus {
+            border-color: var(--accent);
+        }
+
+        .btn-calculate {
+            margin-top: 30px;
+            width: 100%;
+            padding: 18px;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-calculate:hover {
+            background: #732d91;
+        }
+
+        /* Resultados */
+        .result-container {
+            margin-top: 35px;
+            display: none;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .score-box {
+            font-size: 48px;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+
+        .status-tag {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .recommendation {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #2d3436;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 12px;
+            color: #b2bec3;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+    </style>
+</head>
+<body>
+<a href="principal.html" class="btn-regresar">← VOLVER AL INICIO</a>
+<div class="container">
+    <header>
+        <h1>Análisis Multidimensional de la Fatiga (AMMA)</h1>
+    </header>
+
+    <div class="instructions">
+        <strong>Instrucciones:</strong> Valore la frecuencia de aparición de cada síntoma durante el desarrollo de la actividad laboral del trabajador evaluado.
+    </div>
+
+    <div class="amma-grid" id="symptomsList">
+        </div>
+
+    <button class="btn-calculate" onclick="calculateAMMA()">Generar Diagnóstico</button>
+
+    <div id="result" class="result-container">
+        <div id="status" class="status-tag">ESTADO</div>
+        <div class="score-box" id="avgScore">0.0</div>
+        <div class="recommendation" id="recText"></div>
+    </div>
+
+    </div>
+
+<script>
+    const symptoms = [
+        "Cansancio o fatiga visual (pesadez en párpados)",
+        "Dolor o tensión en cuello y región lumbar",
+        "Pérdida de la capacidad de concentración",
+        "Sensación de embotamiento o somnolencia",
+        "Irritabilidad, ansiedad o tensión nerviosa",
+        "Pesadez general o falta de energía física",
+        "Necesidad de cambiar de postura constantemente"
+    ];
+
+    function init() {
+        const container = document.getElementById('symptomsList');
+        container.innerHTML = symptoms.map((s, index) => `
+            <div class="symptom-card">
+                <label>${index + 1}. ${s}</label>
+                <select class="symptom-value">
+                    <option value="1">Nunca (1)</option>
+                    <option value="2">Rara vez (2)</option>
+                    <option value="3">A veces (3)</option>
+                    <option value="4">Frecuentemente (4)</option>
+                    <option value="5">Constantemente (5)</option>
+                </select>
+            </div>
+        `).join('');
+    }
+
+    function calculateAMMA() {
+        const selects = document.querySelectorAll('.symptom-value');
+        let sum = 0;
+        selects.forEach(sel => sum += parseInt(sel.value));
+        
+        const average = (sum / selects.length).toFixed(1);
+        const resultDiv = document.getElementById('result');
+        const statusTag = document.getElementById('status');
+        const scoreBox = document.getElementById('avgScore');
+        const recText = document.getElementById('recText');
+
+        resultDiv.style.display = 'block';
+        scoreBox.innerText = average;
+
+        let color, bg, text, diagnosis;
+
+        if (average >= 4.0) {
+            color = "#ffffff";
+            bg = "#c0392b";
+            text = "FATIGA SEVERA / CRÍTICA";
+            diagnosis = "Nivel de riesgo extremo. El trabajador muestra signos de agotamiento que comprometen su integridad y la seguridad del proceso. Se recomienda cese inmediato de actividades, descanso recuperativo y rediseño de turnos o cargas.";
+        } else if (average >= 2.6) {
+            color = "#2d3436";
+            bg = "#f39c12";
+            text = "FATIGA MODERADA / ALERTA";
+            diagnosis = "Se detecta acumulación de fatiga significativa. Existe riesgo latente de errores operativos. Se recomienda implementar pausas activas, hidratación y revisar la ergonomía del puesto de trabajo.";
+        } else {
+            color = "#ffffff";
+            bg = "#27ae60";
+            text = "FATIGA LEVE / ÓPTIMA";
+            diagnosis = "El trabajador se encuentra en condiciones adecuadas para el desempeño de sus funciones. Se sugiere mantener las condiciones ambientales y de carga actuales.";
+        }
+
+        statusTag.style.backgroundColor = bg;
+        statusTag.style.color = color;
+        statusTag.innerText = text;
+        resultDiv.style.border = `2px solid ${bg}`;
+        recText.innerText = diagnosis;
+
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    init();
+</script>
+
+</body>
+</html>

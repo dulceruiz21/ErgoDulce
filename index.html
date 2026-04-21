@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluación Ergonómica - Registro Completo</title>
+    <style>
+        :root {
+            --primary-blue: #002060;
+            --bg: #f4f7f9;
+            --border: #d1d9e6;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            margin: 0; padding: 0; background: var(--bg); 
+        }
+
+        /* --- PANTALLA INICIAL --- */
+        .welcome-screen {
+            height: 100vh;
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), 
+                        url('https://lh3.googleusercontent.com/d/1NMDsfke556mixtuXfWqvileAV6JJ2ilU');
+            background-size: contain; background-position: center;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: white; text-align: center;
+        }
+
+        .btn-comenzar {
+            padding: 20px 50px; font-size: 22px; font-weight: bold; color: white;
+            background: var(--primary-blue); border: 2px solid white; border-radius: 50px;
+            cursor: pointer; transition: 0.3s;
+        }
+
+        /* --- CONTENEDOR --- */
+        .container { 
+            max-width: 850px; margin: 40px auto; background: white; 
+            padding: 40px; border-radius: 8px; box-shadow: 0 2px 15px rgba(0,0,0,0.1); 
+            border-top: 10px solid var(--primary-blue); 
+        }
+
+        h1 { color: var(--white); text-align: center; }
+        h3 { border-bottom: 2px solid var(--primary-blue); color: var(--primary-blue); padding-bottom: 5px; margin-top: 25px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .field { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px; color: #333; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box; }
+
+        .btn-guardar {
+            width: 100%; padding: 20px; background: var(--primary-blue); color: white; 
+            border: none; border-radius: 4px; font-size: 18px; font-weight: bold; 
+            cursor: pointer; margin-top: 30px; transition: background 0.3s;
+
+        }
+
+        .btn-guardar:hover { background: #001540; }
+
+        @media (max-width: 600px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div id="start-screen" class="welcome-screen">
+        <h1>ERGO_DULCE</h1>
+        <button class="btn-comenzar" onclick="showForm()">Comenzar</button>
+    </div>
+
+    <div id="form-screen" style="display: none;">
+        <div class="container">
+            <h1>Formulario de Registro</h1>
+            <form id="registroForm">
+                
+                <div class="section">
+                    <h3>1. Identificación del participante</h3>
+                    <div class="field"><label>1.1. Código del participante:</label><input type="text" id="cod_part"></div>
+                    <div class="grid">
+                        <div class="field"><label>1.2. Área / Departamento:</label><input type="text" id="area"></div>
+                        <div class="field"><label>1.3. Puesto de trabajo:</label><input type="text" id="puesto"></div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>2. Datos personales básicos</h3>
+                    <div class="grid">
+                        <div class="field"><label>2.1. Edad (años):</label><input type="number" id="edad"></div>
+                        <div class="field">
+                            <label>2.2. Sexo biológico:</label>
+                            <select id="sexo">
+                                <option>Femenino</option><option>Masculino</option><option>No responde</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <div class="field"><label>2.3. Nivel educativo:</label>
+                            <select id="educacion">
+                                <option>Primaria</option><option>Secundaria</option><option>Bachillerato / Preparatoria</option>
+                                <option>Técnico(a)</option><option>Licenciatura</option><option>Posgrado</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>2.4. Estado civil:</label>
+                            <select id="civil">
+                                <option>Soltero(a)</option><option>Casado(a) / Unión libre</option>
+                                <option>Separado(a) / Divorciado(a)</option><option>Viudo(a)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>3. Información laboral</h3>
+                    <div class="grid">
+                        <div class="field">
+                            <label>3.1. Tipo de contrato:</label>
+                            <select id="contrato">
+                                <option>Base / Planta</option><option>Eventual</option>
+                                <option>Outsourcing</option><option>Otro</option>
+                            </select>
+                        </div>
+                        <div class="field"><label>Especifique otro (si aplica):</label><input type="text" id="contrato_otro"></div>
+                    </div>
+                    <div class="grid">
+                        <div class="field"><label>3.2. Antigüedad puesto:</label><select id="ant_puesto"><option>< 1 año</option><option>1–3 años</option><option>4–10 años</option><option>> 10 años</option></select></div>
+                        <div class="field"><label>3.3. Antigüedad empresa:</label><select id="ant_empresa"><option>< 1 año</option><option>1–3 años</option><option>4–10 años</option><option>> 10 años</option></select></div>
+                    </div>
+                    <div class="grid">
+                        <div class="field">
+                            <label>3.4. Turno:</label>
+                            <select id="turno"><option>Matutino</option><option>Vespertino</option><option>Nocturno</option><option>Rotatorio</option></select>
+                        </div>
+                        <div class="field">
+                            <label>3.5. Jornada:</label>
+                            <div style="display:flex; gap:5px;"><input type="number" placeholder="Hrs/día" id="hrs_dia"><input type="number" placeholder="Días/sem" id="dias_sem"></div>
+                        </div>
+                    </div>
+                    <div class="field"><label>3.6. Pausas (cantidad y duración):</label><input type="text" id="pausas" placeholder="Ej: 2 pausas de 10 min"></div>
+                    <div class="field"><label>3.7. Tiempo en tarea específica (PLIBEL):</label><select id="tiempo_plib"><option>< 6 meses</option><option>6–12 meses</option><option>1–3 años</option><option>> 3 años</option></select></div>
+                </div>
+
+                <div class="section">
+                    <h3>4. Características de la tarea</h3>
+                    <label>4.1. Tipo principal de tarea:</label>
+                    <textarea id="tipo_tarea" rows="2" placeholder="Oficina, ensamble, cargas, etc."></textarea>
+                    
+                    <div class="grid" style="margin-top:10px;">
+                        <div class="field">
+                            <label>4.2. Posición predominante:</label>
+                            <select id="posicion">
+                                <option>Sentado(a)</option><option>De pie</option><option>Caminando</option><option>Mixta</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>4.3. Mov. Repetitivos:</label>
+                            <select id="repetitivo">
+                                <option>Sí</option><option>No</option><option>No estoy seguro(a)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid">
+                        <div class="field">
+                            <label>4.4. Cargas > 5kg:</label>
+                            <select id="cargas_5kg">
+                                <option>Nunca</option><option>Ocasionalmente</option><option>Frecuentemente</option>
+                            </select>
+                        </div>
+                        <div class="field">
+                            <label>4.5. Uso de EPP:</label>
+                            <input type="text" id="epp" placeholder="Indique cuál o 'No uso'">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>5. Salud y estilo de vida</h3>
+                    <div class="grid">
+                        <div class="field"><label>5.1. Actividad física:</label><select id="ejercicio"><option>< 1 vez/sem</option><option>1–2 veces/sem</option><option>3+ veces/sem</option></select></div>
+                        <div class="field"><label>5.2. ¿Fuma?:</label><select id="fuma"><option>Sí</option><option>No</option><option>Exfumador(a)</option></select></div>
+                    </div>
+                    <div class="field"><label>5.3. Diagnóstico médico previo (región):</label><input type="text" id="diag_medico" placeholder="Región o 'No'"></div>
+                </div>
+
+                <div class="section">
+                    <h3>6. Vinculación con instrumentos</h3>
+                    <div class="grid">
+                        <div class="field"><label>6.1. Fecha aplicación Nórdico:</label><input type="date" id="fecha_nordico"></div>
+                        <div class="field"><label>Molestia principal:</label><input type="text" id="molestia_nordico"></div>
+                    </div>
+                    <div class="field"><label>6.2. Código PLIBEL (Evaluador):</label><input type="text" id="cod_plibel"></div>
+                </div>
+
+                <button type="button" class="btn-guardar" onclick="enviarAMetodos()">
+                    GUARDAR DATOS 
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function showForm() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('form-screen').style.display = 'block';
+            window.scrollTo(0,0);
+        }
+
+        function enviarAMetodos() {
+            const form = document.getElementById('registroForm');
+            const data = {};
+            
+            // Recopilar todos los inputs
+            form.querySelectorAll('input, select, textarea').forEach(el => {
+                if(el.id) data[el.id] = el.value;
+            });
+
+            // Guardar localmente
+            localStorage.setItem('datos_ergonomia', JSON.stringify(data));
+            
+            // Navegar a la otra página
+            window.location.href = "principal.html";
+        }
+    </script>
+</body>
+</html>
