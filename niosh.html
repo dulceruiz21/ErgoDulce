@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIOSH</title>
+    <style>
+        :root {
+            --primary: #1a2a3a;    /* Azul Petróleo */
+            --secondary: #2980b9;  /* Azul Corporativo */
+            --accent: #3498db;     /* Azul Brillante */
+            --bg: #f4f7f9;
+            --white: #ffffff;
+            --success: #27ae60;
+            --warning: #3498db;    /* Azul para riesgo medio según tu petición */
+            --danger: #c0392b;
+            --text: #2c3e50;
+        }
+
+        body { 
+            font-family: 'Inter', 'Segoe UI', sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 40px 20px; 
+        }
+
+        .container { 
+            max-width: 900px; 
+            margin: 0 auto; 
+            background: var(--white); 
+            border-radius: 12px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            overflow: hidden;
+            border-top: 6px solid var(--secondary);
+        }
+
+        header { 
+            background: var(--primary); 
+            color: white; 
+            padding: 30px; 
+            text-align: center; 
+        }
+
+        header h1 { margin: 0; font-size: 22px; letter-spacing: 1px; text-transform: uppercase; }
+        header p { margin: 8px 0 0; opacity: 0.8; font-weight: 300; font-size: 14px; }
+
+        .form-section { padding: 40px; }
+        
+        .grid-inputs { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 25px; 
+        }
+
+        .input-group { display: flex; flex-direction: column; gap: 8px; }
+        .input-group label { font-weight: 700; font-size: 13px; color: var(--primary); }
+        .input-group span { font-size: 11px; color: #7f8c8d; }
+
+        input, select { 
+            padding: 12px; 
+            border: 1.5px solid #dcdde1; 
+            border-radius: 6px; 
+            font-size: 14px; 
+            transition: 0.3s; 
+        }
+
+        input:focus { border-color: var(--secondary); outline: none; box-shadow: 0 0 8px rgba(41, 128, 185, 0.2); }
+
+        .btn-calc { 
+            grid-column: 1 / -1; 
+            padding: 18px; 
+            background: var(--secondary); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 16px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            margin-top: 20px; 
+            transition: 0.3s; 
+            text-transform: uppercase;
+        }
+
+        .btn-calc:hover { background: var(--primary); transform: translateY(-2px); }
+
+        /* Panel de Resultados */
+        .result-panel { 
+            margin-top: 40px; 
+            padding: 30px; 
+            border-radius: 12px; 
+            background: #f8f9fa; 
+            display: none; 
+            border: 1px solid #e1e4e8;
+        }
+
+        .result-grid { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+            margin-bottom: 25px;
+        }
+
+        .metric-card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            text-align: center; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .metric-card h3 { margin: 0; font-size: 12px; color: #7f8c8d; text-transform: uppercase; }
+        .metric-card div { font-size: 32px; font-weight: 900; color: var(--primary); margin-top: 5px; }
+
+        .status-bar { 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-weight: 700; 
+            text-align: center; 
+            margin-top: 20px; 
+            font-size: 15px;
+        }
+
+        footer { 
+            padding: 25px; 
+            text-align: center; 
+            font-size: 12px; 
+            color: #95a5a6; 
+            background: #f8f9fa; 
+            border-top: 1px solid #eee; 
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1> Ecuación NIOSH</h1>
+       
+    </header>
+
+    <div class="form-section">
+        <div class="grid-inputs">
+            <div class="input-group">
+                <label>Peso Real de la Carga (kg)</label>
+                <span>Masa exacta del objeto a levantar.</span>
+                <input type="number" id="loadW" value="10" step="0.1">
+            </div>
+
+            <div class="input-group">
+                <label>H: Distancia Horizontal (cm)</label>
+                <span>Desde el punto medio de los tobillos.</span>
+                <input type="number" id="hDist" value="25">
+            </div>
+
+            <div class="input-group">
+                <label>V: Altura Vertical (cm)</label>
+                <span>Desde el suelo hasta las manos.</span>
+                <input type="number" id="vDist" value="75">
+            </div>
+
+            <div class="input-group">
+                <label>D: Distancia de Desplazamiento (cm)</label>
+                <span>Diferencia vertical entre origen y destino.</span>
+                <input type="number" id="dDist" value="25">
+            </div>
+
+            <div class="input-group">
+                <label>A: Ángulo de Asimetría (°)</label>
+                <span>Grados de giro del tronco (0-135°).</span>
+                <input type="number" id="aAngle" value="0">
+            </div>
+
+            <div class="input-group">
+                <label>F: Frecuencia (lev/min)</label>
+                <span>Número de levantamientos por minuto.</span>
+                <input type="number" id="fFreq" value="0.2" step="0.1">
+            </div>
+
+            <div class="input-group">
+                <label>Duración de la Tarea</label>
+                <span>Tiempo total de la actividad por turno.</span>
+                <select id="tDur">
+                    <option value="1">Corta (&lt; 1 hora)</option>
+                    <option value="2">Moderada (1 - 2 horas)</option>
+                    <option value="8">Larga (2 - 8 horas)</option>
+                </select>
+            </div>
+
+            <div class="input-group">
+                <label>Acoplamiento (Agarre)</label>
+                <span>Calidad de las asas o contenedores.</span>
+                <select id="cCoupling">
+                    <option value="1.0">Bueno (Asas ergonómicas)</option>
+                    <option value="0.95">Regular (Agarre aceptable)</option>
+                    <option value="0.90">Malo (Cargas sin asas)</option>
+                </select>
+            </div>
+
+            <button class="btn-calc" onclick="calcularNIOSH()">Ejecutar Análisis de Riesgo</button>
+        </div>
+
+        <div id="resPanel" class="result-panel">
+            <div class="result-grid">
+                <div class="metric-card">
+                    <h3>RWL (Límite Recomendado)</h3>
+                    <div id="rwlResult">0.0 kg</div>
+                </div>
+                <div class="metric-card">
+                    <h3>LI (Índice de Levantamiento)</h3>
+                    <div id="liResult">0.0</div>
+                </div>
+            </div>
+            <div id="statusTag" class="status-bar"></div>
+            <p id="adviseText" style="font-size: 13px; text-align: center; margin-top: 15px; color: #666;"></p>
+        </div>
+    </div>
+
+   </div>
+
+<script>
+    function calcularNIOSH() {
+        const LC = 23; // Constante de carga
+        
+        // Captura de valores
+        const L = parseFloat(document.getElementById('loadW').value);
+        const H = parseFloat(document.getElementById('hDist').value);
+        const V = parseFloat(document.getElementById('vDist').value);
+        const D = parseFloat(document.getElementById('dDist').value);
+        const A = parseFloat(document.getElementById('aAngle').value);
+        const F = parseFloat(document.getElementById('fFreq').value);
+        const CM = parseFloat(document.getElementById('cCoupling').value);
+
+        // Cálculo de Multiplicadores
+        const HM = (H <= 25) ? 1.0 : (25 / H);
+        const VM = 1 - (0.003 * Math.abs(V - 75));
+        const DM = 0.82 + (4.5 / D);
+        const AM = 1 - (0.0032 * A);
+        
+        // Multiplicador de Frecuencia Simplificado (Basado en Tabla NIOSH)
+        let FM = 1.0;
+        if (F > 0.2 && F <= 1) FM = 0.94;
+        else if (F > 1 && F <= 4) FM = 0.84;
+        else if (F > 4 && F <= 9) FM = 0.52;
+        else if (F > 9) FM = 0.21;
+
+        // Ecuación Final
+        const RWL = (LC * HM * VM * DM * AM * FM * CM).toFixed(2);
+        const LI = (L / RWL).toFixed(2);
+
+        // UI
+        const panel = document.getElementById('resPanel');
+        const rwlTag = document.getElementById('rwlResult');
+        const liTag = document.getElementById('liResult');
+        const status = document.getElementById('statusTag');
+        const advise = document.getElementById('adviseText');
+
+        panel.style.display = 'block';
+        rwlTag.innerText = `${RWL} kg`;
+        liTag.innerText = LI;
+
+        // Interpretación de Resultados (Azul para riesgo medio)
+        if (LI <= 1.0) {
+            status.innerText = "RIESGO BAJO: TAREA SEGURA";
+            status.style.backgroundColor = "#d4edda";
+            status.style.color = "#155724";
+            advise.innerText = "La mayoría de los trabajadores  pueden realizar esta tarea sin riesgo.";
+        } else if (LI <= 3.0) {
+            status.innerText = "RIESGO MODERADO: REQUIERE CONTROL";
+            status.style.backgroundColor = "#d1ecf1"; // Azul claro
+            status.style.color = "#0c5460";          // Azul oscuro
+            advise.innerText = "Nivel de riesgo significativo. Se recomienda rediseñar el puesto o rotar al personal.";
+        } else {
+            status.innerText = "RIESGO ALTO: PELIGRO DE LESIÓN";
+            status.style.backgroundColor = "#f8d7da";
+            status.style.color = "#721c24";
+            advise.innerText = "El nivel de riesgo está elevado, hay que corregir la tarea ya";
+        }
+
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
